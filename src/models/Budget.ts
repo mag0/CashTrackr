@@ -1,12 +1,16 @@
-import { Table, Column, Model, HasMany, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, DataType, ForeignKey, BelongsTo, AllowNull } from 'sequelize-typescript';
 import Expense from './Expense';
+import User from './User';
 
 @Table({ tableName: 'budgets' })
 
 class Budget extends Model<Budget> {
+
+    @AllowNull(false)
     @Column({ type: DataType.STRING(100) })
     declare name: string;
 
+    @AllowNull(false)
     @Column({ type: DataType.DECIMAL })
     declare amount: number;
 
@@ -15,6 +19,12 @@ class Budget extends Model<Budget> {
         onDelete: 'CASCADE'
     })
     declare expenses: Expense[];
+
+    @ForeignKey(() => User)
+    declare userId: number;
+
+    @BelongsTo(() => User)
+    declare user: User;
 
 }
 
