@@ -68,4 +68,54 @@ export class AuthController {
 
         res.json({ token });
     }
+
+    static forgotPassword = async (req: Request, res: Response) => {
+        const { email } = req.body;
+
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Generate a password reset token
+        const token = generateToken();
+        user.token = token;
+        await user.save();
+
+        // Send the password reset email
+        await AuthEmail.sendPasswordResetToken({
+            name: user.name,
+            email: user.email,
+            token
+        });
+
+        res.json({ message: 'Password reset email sent' });
+    }
+
+    static validateToken = async (req: Request, res: Response) => {
+        const { token } = req.body;
+
+        const user = await User.findOne({ where: { token } });
+        if (!user) {
+            return res.status(404).json({ error: 'Invalid token' });
+        }
+
+        res.json({ message: 'Token is valid' });
+    }
+
+    static resetPassword = async (req: Request, res: Response) => {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        const user = await User.findOne({ where: { token } });
+        if (!user) {
+            return res.status(404).json({ error: 'Invalid token' });
+        }
+
+        user.password = await hashPassword(password);
+        user.token = null;
+        await user.save();
+
+        res.json({ message: 'Password reset successfully' });
+    }
 }

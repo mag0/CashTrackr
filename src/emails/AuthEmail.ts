@@ -43,4 +43,28 @@ export class AuthEmail {
 
         console.log('Confirmation email sent:', email.messageId);
     }
+
+    static sendPasswordResetToken = async (user: EmailType) => {
+        const email = await transport.sendMail({
+            from: 'CashTrackr <admin@cashtrackr.com>',
+            to: user.email,
+            subject: 'Password Reset Instructions',
+            html: `
+                <div style="font-family: 'Segoe UI', sans-serif; background-color: #f4f6f8; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; color: #2c3e50;">
+                    <h2 style="margin-bottom: 10px;">Hi ${user.name},</h2>
+                    <p style="font-size: 16px; margin-bottom: 20px;">
+                    It seems like you requested a password reset. To proceed, please visit the link below:
+                    </p>
+                    <a href="[Password Reset Link]" style="background-color: #27ae60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                        Reset My Password
+                    </a>
+                    <p style="font-size: 20px; font-weight: bold; color: #e67e22; text-align: center; letter-spacing: 1px;">
+                    and enter the token: ${user.token}
+                    </p>
+                </div>
+`
+        });
+
+        console.log('Confirmation email sent:', email.messageId);
+    }
 }
