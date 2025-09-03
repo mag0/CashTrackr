@@ -2,10 +2,10 @@ import type { Request, Response } from 'express'
 import User from '../models/User';
 import { hashPassword } from '../utils/auth';
 import { generateToken } from '../utils/token';
-import { AuthEmail } from '../emails/authEmail';
+import { AuthEmail } from '../emails/AuthEmail';
 
 export class AuthController {
-    static register = async (req: Request, res: Response) => {
+    static createAccount = async (req: Request, res: Response) => {
         const { email, password } = req.body;
 
         const existingUser = await User.findOne({ where: { email } });
@@ -31,7 +31,18 @@ export class AuthController {
         }
     }
 
-    static login = async (req: Request, res: Response) => {
-        const { email, password } = req.body;
+    static confirmAccount = async (req: Request, res: Response) => {
+        const { token } = req.body;
+
+        const user = await User.findOne({ where: { token } });
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+
+        user.confirmed = true;
+        user.token = null;
+        await user.save();
+
+        res.json({ message: 'Account confirmed successfully' });
     }
 }
