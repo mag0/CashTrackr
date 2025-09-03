@@ -118,4 +118,8 @@ export class AuthController {
 
         res.json({ message: 'Password reset successfully' });
     }
+
+    static getUser = async (req: Request, res: Response) => {
+        res.json(req.user);
+    }
 }
