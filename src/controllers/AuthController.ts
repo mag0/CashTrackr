@@ -1,8 +1,9 @@
 import type { Request, Response } from 'express'
 import User from '../models/User';
-import { hashPassword } from '../utils/auth';
+import { checkPasswords, hashPassword } from '../utils/auth';
 import { generateToken } from '../utils/token';
 import { AuthEmail } from '../emails/AuthEmail';
+import { generateJWT } from '../utils/jwt';
 
 export class AuthController {
     static createAccount = async (req: Request, res: Response) => {
@@ -44,5 +45,27 @@ export class AuthController {
         await user.save();
 
         res.json({ message: 'Account confirmed successfully' });
+    }
+
+    static login = async (req: Request, res: Response) => {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (!user.confirmed) {
+            return res.status(401).json({ error: 'Account not confirmed' });
+        }
+
+        const isPasswordCorrect = await checkPasswords(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ error: 'Invalid password' });
+        }
+
+        const token = generateJWT(user.id);
+
+        res.json({ token });
     }
 }
