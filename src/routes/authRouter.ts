@@ -54,4 +54,19 @@ router.get('/user',
     AuthController.getUser
 );
 
+router.post('/update-password',
+    authenticate,
+    body('current_password').notEmpty().withMessage('Password is required'),
+    body('password').isLength({ min: 8 }).withMessage('New password must be at least 8 characters long'),
+    handleInputErrors,
+    AuthController.updateCurrentUserPassword
+)
+
+router.post('/check-password',
+    authenticate,
+    body('password').notEmpty().withMessage('Password is required'),
+    handleInputErrors,
+    AuthController.checkPassword
+)
+
 export default router;
