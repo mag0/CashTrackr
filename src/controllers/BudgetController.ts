@@ -22,7 +22,7 @@ export class BudgetController {
             const budget = await Budget.create(req.body);
             budget.userId = req.user.id
             await budget.save()
-            res.status(201).json(budget);
+            res.status(201).json('Budget created succefully');
         } catch (error) {
             res.status(500).json({ error: 'Error creating budget' });
         }
@@ -32,8 +32,6 @@ export class BudgetController {
         const budget = await Budget.findByPk(req.budget.id, {
             include: [Expense]
         });
-
-
 
         res.json(budget);
     }

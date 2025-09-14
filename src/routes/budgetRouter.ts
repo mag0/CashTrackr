@@ -5,7 +5,6 @@ import { handleInputErrors } from "../middleware/validation";
 import { ExpensesController } from "../controllers/ExpenseController";
 import { validateExpenseExists, validateExpenseId, validateExpenseInput } from "../middleware/expense";
 import { authenticate } from "../middleware/auth";
-import Budget from "../models/Budget";
 
 const router = Router();
 
